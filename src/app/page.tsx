@@ -1,9 +1,9 @@
-import { LatestBookingCard } from "@/components/latest-booking-card";
+import { LatestBookingsSection } from "@/components/latest-bookings/latest-bookings-section";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <LatestBookingCard />
+    <div className="mx-5 sm:mx-10">
+      <LatestBookingsSection />
     </div>
   );
 }
