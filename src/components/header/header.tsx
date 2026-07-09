@@ -45,6 +45,7 @@ export default function Header({
                 alt={avatarAlt}
                 fill
                 className="object-cover"
+                sizes="160px"
                 priority
               />
             </div>
