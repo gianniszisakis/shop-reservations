@@ -1,7 +1,7 @@
-import Image from "next/image";
-import { CalendarDays } from "lucide-react";
-
 import { NewBookingButton } from "../new-booking/new-booking-button";
+import HeaderAvatar from "./header-avatar";
+import HeaderHeading from "./header-heading";
+import HeaderInfoBox from "./header-info-box";
 
 interface HeaderProps {
   heroBgUrl: string;
@@ -39,38 +39,22 @@ export default function Header({
         <div className="-mt-20 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           {/* Left */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-            <div className="relative h-40 w-40 overflow-hidden rounded-full border-4 border-background bg-white shadow-xl">
-              <Image
-                src={avatarImgUrl}
-                alt={avatarAlt}
-                fill
-                className="object-cover"
-                sizes="160px"
-                priority
-              />
-            </div>
+            <HeaderAvatar src={avatarImgUrl} alt={avatarAlt} />
 
             <div className="pb-2">
-              <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-                {heroTitle}
-              </h1>
+              <HeaderHeading title={heroTitle} />
 
               <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                <div
-                  className={`flex items-center gap-2 rounded-full px-4 py-2 ${infoTextboxBgColor}`}
-                >
-                  <CalendarDays className={`h-4 w-4 ${calendarColor}`} />
-                  <span>{textInfoOne}</span>
-                </div>
-
-                <span className="hidden sm:block">•</span>
-
-                <div
-                  className={`flex items-center gap-2 rounded-full px-4 py-2 ${infoTextboxBgColor}`}
-                >
-                  <CalendarDays className={`h-4 w-4 ${calendarColor}`} />
-                  <span>{textInfoTwo}</span>
-                </div>
+                <HeaderInfoBox
+                  bgColor={infoTextboxBgColor}
+                  calendarColor={calendarColor}
+                  textInfo={textInfoOne}
+                />
+                <HeaderInfoBox
+                  bgColor={infoTextboxBgColor}
+                  calendarColor={calendarColor}
+                  textInfo={textInfoTwo}
+                />
               </div>
             </div>
           </div>
