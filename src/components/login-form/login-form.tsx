@@ -1,20 +1,39 @@
+"use client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    const result = await signIn("credentials", {
+      username,
+      password,
+      redirect: false,
+      callbackUrl: "/",
+    });
+
+    if (result?.error) {
+      setError("Λάθος username ή password.");
+      return;
+    }
+    window.location.href = "/";
+  }
+
   return (
     <div className={cn("min-h-screen w-full", className)} {...props}>
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center">
@@ -58,7 +77,10 @@ export function LoginForm({
             </div>
 
             {/* Right side */}
-            <form className="flex flex-col justify-center p-6 sm:p-10 lg:p-12">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col justify-center p-6 sm:p-10 lg:p-12"
+            >
               <FieldGroup className="space-y-6">
                 <div className="flex flex-col gap-2 text-center lg:text-left">
                   <p className="text-sm font-medium uppercase tracking-[0.2em] text-pink-600">
@@ -78,6 +100,8 @@ export function LoginForm({
                     id="username"
                     type="text"
                     placeholder="your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="h-12 rounded-xl border-pink-100 bg-pink-50/40 focus-visible:ring-pink-500"
                     required
                   />
@@ -92,10 +116,14 @@ export function LoginForm({
                   <Input
                     id="password"
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="h-12 rounded-xl border-pink-100 bg-pink-50/40 focus-visible:ring-pink-500"
                     required
                   />
                 </Field>
+
+                {error && <p className="text-sm text-destructive">{error}</p>}
 
                 <Field>
                   <Button
