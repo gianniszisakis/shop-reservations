@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import ImageLogo from "./image-logo";
@@ -76,9 +75,6 @@ export function LoginForm({
                   <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
                     Login
                   </h1>
-                  <p className="text-sm text-muted-foreground">
-                    Είσοδος χρήστη
-                  </p>
                 </div>
 
                 <Field>
