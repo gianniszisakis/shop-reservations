@@ -2,6 +2,7 @@ import { NewBookingButton } from "../new-booking/new-booking-button";
 import HeaderAvatar from "./header-avatar";
 import HeaderHeading from "./header-heading";
 import HeaderInfoBox from "./header-info-box";
+import { LogoutButton } from "./header-logout-button";
 
 interface HeaderProps {
   heroBgUrl: string;
@@ -62,6 +63,7 @@ export default function Header({
           {/* Right */}
           <div className="flex items-center gap-4 pb-2">
             <NewBookingButton />
+            <LogoutButton />
           </div>
         </div>
       </div>
