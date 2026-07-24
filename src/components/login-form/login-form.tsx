@@ -36,8 +36,8 @@ export function LoginForm({
   }
 
   return (
-    <div className={cn("min-h-screen w-full", className)} {...props}>
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center">
+    <div className={cn("w-full", className)} {...props}>
+      <div className="mx-auto flex w-full max-w-6xl items-center">
         <Card className="w-full overflow-hidden border border-pink-100 bg-card/95 shadow-2xl backdrop-blur p-0">
           <CardContent className="grid p-0 lg:grid-cols-2">
             {/* Left side */}
