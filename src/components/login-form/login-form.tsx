@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import ImageLogo from "./image-logo";
+import LoginHeading from "./login-heading";
 
 export function LoginForm({
   className,
@@ -43,34 +45,19 @@ export function LoginForm({
             <div className="relative hidden overflow-hidden bg-pink-50 lg:block">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(244,114,182,0.22),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.16),transparent_30%)]" />
 
-              <div className="relative flex h-full flex-col justify-between p-10">
+              <div className="relative flex h-full flex-col justify-center p-2">
                 <div>
                   <div className="flex items-center gap-4">
-                    <div className="relative h-20 w-20 overflow-hidden rounded-full border-4 border-white bg-white shadow-lg">
-                      <Image
-                        src="/images/after-glow-logo.jpg"
-                        alt="After Glow Logo"
-                        fill
-                        sizes="80px"
-                        className="object-cover"
-                        priority
-                      />
-                    </div>
+                    <ImageLogo
+                      size="80px"
+                      src="/images/after-glow-logo.jpg"
+                      altText="After Glow Logo"
+                    />
 
-                    <div>
-                      <h2 className="text-3xl font-bold tracking-tight text-zinc-900">
-                        After Glow
-                      </h2>
-                      <p className="mt-1 text-sm text-zinc-600">
-                        Σύστημα Διαχείρισης Κρατήσεων/Ραντεβού
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-10 max-w-md space-y-4">
-                    <h3 className="text-4xl font-bold tracking-tight text-zinc-900">
-                      Είσοδος στο σύστημα
-                    </h3>
+                    <LoginHeading
+                      heading="After Glow"
+                      subheading="Σύστημα Διαχείρισης Κρατήσεων/Ραντεβού"
+                    />
                   </div>
                 </div>
               </div>
