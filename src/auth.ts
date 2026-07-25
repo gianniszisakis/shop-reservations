@@ -15,7 +15,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (
           !process.env.ADMIN_USERNAME ||
-          process.env.ADMIN_PASSWORD ||
+          !process.env.ADMIN_PASSWORD ||
           typeof username !== "string" ||
           username.length === 0 ||
           typeof password !== "string" ||
