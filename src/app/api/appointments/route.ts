@@ -54,6 +54,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (new Set(serviceIds).size !== serviceIds.length) {
+      return NextResponse.json(
+        { error: "Duplicate services are not allowed" },
+        { status: 400 },
+      );
+    }
+
     if (!startDateTime) {
       return NextResponse.json(
         { error: "Start date and time are required" },
@@ -72,7 +79,9 @@ export async function POST(request: Request) {
 
     const [customer, source, services] = await Promise.all([
       prisma.customer.findUnique({
-        where: { id: customerId },
+        where: {
+          id: customerId,
+        },
       }),
 
       prisma.source.findFirst({
@@ -116,6 +125,28 @@ export async function POST(request: Request) {
     );
 
     const end = new Date(start.getTime() + totalDurationMinutes * 60 * 1000);
+
+    const overlappingAppointment = await prisma.appointment.findFirst({
+      where: {
+        status: "CONFIRMED",
+        startDateTime: {
+          lt: end,
+        },
+        endDateTime: {
+          gt: start,
+        },
+      },
+    });
+
+    if (overlappingAppointment) {
+      return NextResponse.json(
+        {
+          error:
+            "The selected time overlaps with another confirmed appointment",
+        },
+        { status: 409 },
+      );
+    }
 
     const appointment = await prisma.appointment.create({
       data: {

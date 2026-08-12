@@ -33,3 +33,22 @@ export interface Appointment {
   source: AppointmentSource;
   services: AppointmentService[];
 }
+
+export interface CreateAppointmentInput {
+  customerId: string;
+  sourceId: string;
+  serviceIds: string[];
+  startDateTime: string;
+  notes?: string | null;
+}
+
+export interface UpdateAppointmentInput {
+  customerId?: string;
+  sourceId?: string;
+  serviceIds?: string[];
+  startDateTime?: string;
+  notes?: string | null;
+  status?: AppointmentStatus;
+}
+
+export type AppointmentStatus = "CONFIRMED" | "COMPLETED" | "CANCELLED";
