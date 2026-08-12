@@ -8,7 +8,7 @@ export async function getAppointments(): Promise<Appointment[]> {
   return response.json();
 }
 
-export async function getAppointment(id: string): Promise<Appointment[]> {
+export async function getAppointment(id: string): Promise<Appointment> {
   const response = await fetch(`/api/appointments/${id}`);
   if (!response.ok) {
     throw new Error("Failed to load appointment");
