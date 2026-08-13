@@ -5,6 +5,7 @@ export function useCustomers(search?: string) {
   return useQuery({
     queryKey: ["customers", search ?? ""],
     queryFn: () => getCustomers(search),
+    enabled: !!search?.trim(),
   });
 }
 
