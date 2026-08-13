@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCustomers, getCustomer } from "./api";
 
-export function useCustomers() {
+export function useCustomers(search?: string) {
   return useQuery({
-    queryKey: ["customers"],
-    queryFn: getCustomers,
+    queryKey: ["customers", search ?? ""],
+    queryFn: () => getCustomers(search),
   });
 }
 
