@@ -5,9 +5,11 @@ import { Button } from "../ui/button";
 import CustomerSearch from "./customer-search";
 
 import NewCustomerFields from "./new-customer-fields";
+import ServiceSelect from "./service-select";
 
 export default function BookingForm() {
   const [customerId, setCustomerId] = useState<string>();
+  const [serviceIds, setServiceIds] = useState<string[]>([]);
   const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
   return (
     <form
@@ -35,6 +37,8 @@ export default function BookingForm() {
           }}
         />
       )}
+
+      <ServiceSelect value={serviceIds} onChange={setServiceIds} />
 
       <div className="flex flex-col gap-3 border-t pt-6 sm:flex-row sm:justify-end">
         <Button type="button" variant="outline" className="w-full sm:w-auto">
