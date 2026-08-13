@@ -8,6 +8,7 @@ import NewCustomerFields from "./new-customer-fields";
 import ServiceSelect from "./service-select";
 import SourceSelect from "./source-select";
 import BookingDateTime from "./booking-date-time";
+import BookingNotes from "./booking-notes";
 
 export default function BookingForm() {
   const [customerId, setCustomerId] = useState<string>();
@@ -15,10 +16,9 @@ export default function BookingForm() {
   const [sourceId, setSourceId] = useState<string>();
   const [bookingDate, setBookingDate] = useState<Date>();
   const [bookingTime, setBookingTime] = useState("");
+  const [notes, setNotes] = useState("");
   const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
 
-  console.log("Booking Date", bookingDate);
-  console.log("Booking Time", bookingTime);
   return (
     <form
       onSubmit={(event) => {
@@ -48,12 +48,15 @@ export default function BookingForm() {
 
       <ServiceSelect value={serviceIds} onChange={setServiceIds} />
       <SourceSelect value={sourceId} onChange={setSourceId} />
+
       <BookingDateTime
         date={bookingDate}
         time={bookingTime}
         onDateChange={setBookingDate}
         onTimeChange={setBookingTime}
       />
+
+      <BookingNotes value={notes} onChange={setNotes} />
 
       <div className="flex flex-col gap-3 border-t pt-6 sm:flex-row sm:justify-end">
         <Button type="button" variant="outline" className="w-full sm:w-auto">
