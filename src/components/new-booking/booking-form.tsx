@@ -13,9 +13,16 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { bookingSchema, type BookingFormValues } from "./booking-schema";
 import { toast } from "sonner";
+import { useCreateAppointment } from "@/features/appointments/mutations";
 
-export default function BookingForm() {
+interface BookingFormProps {
+  onSuccess: () => void;
+}
+
+export default function BookingForm({ onSuccess }: BookingFormProps) {
   const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
+
+  const createAppointment = useCreateAppointment();
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -60,7 +67,54 @@ export default function BookingForm() {
   });
 
   function onSubmit(values: BookingFormValues) {
-    console.log(values);
+    if (!values.bookingDate) {
+      toast.error("Επέλεξε ημερομηνία.");
+      return;
+    }
+
+    const [hours, minutes] = values.bookingTime.split(":").map(Number);
+
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+      toast.error("Επέλεξε έγκυρη ώρα.");
+      return;
+    }
+
+    // Clone the selected date so we don't mutate the form value.
+    const startDateTime = new Date(values.bookingDate);
+
+    startDateTime.setHours(hours, minutes, 0, 0);
+
+    createAppointment.mutate(
+      {
+        customerId: values.customerId,
+        sourceId: values.sourceId,
+        serviceIds: values.serviceIds,
+        startDateTime: startDateTime.toISOString(),
+        notes: values.notes?.trim() || null,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Το ραντεβού δημιουργήθηκε", {
+            description: "Το ραντεβού αποθηκεύτηκε επιτυχώς.",
+          });
+
+          form.reset();
+
+          setIsCreatingCustomer(false);
+
+          onSuccess();
+        },
+
+        onError: (error) => {
+          toast.error("Αποτυχία δημιουργίας ραντεβού", {
+            description:
+              error instanceof Error
+                ? error.message
+                : "Παρουσιάστηκε κάποιο πρόβλημα.",
+          });
+        },
+      },
+    );
   }
 
   const onInvalid = () => {
@@ -160,10 +214,10 @@ export default function BookingForm() {
         onChange={(value) => form.setValue("notes", value)}
       />
 
-      <div className="flex flex-col gap-3 border-t pt-6 sm:flex-row sm:justify-end">
-        <Button type="button" variant="outline" className="w-full sm:w-auto">
+      <div className="flex flex-col gap-3 border-t pt-6 sm:flex-row sm:justify-start">
+        {/* <Button type="button" variant="outline" className="w-full sm:w-auto">
           Ακύρωση
-        </Button>
+        </Button> */}
 
         <Button
           type="submit"

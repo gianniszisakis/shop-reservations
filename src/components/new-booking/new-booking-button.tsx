@@ -22,7 +22,7 @@ export function NewBookingButton() {
       <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent className="h-dvh w-full overflow-y-auto p-0 md:h-[calc(100dvh-2rem)] md:rounded-2xl lg:h-full lg:rounded-none">
           <BackHeader title="Νέο Ραντεβού" />
-          <BookingForm />
+          <BookingForm onSuccess={() => setSheetOpen(false)} />
         </SheetContent>
       </Sheet>
     </>
