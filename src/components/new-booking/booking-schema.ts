@@ -2,15 +2,17 @@ import { z } from "zod";
 
 export const bookingSchema = z
   .object({
-    customerId: z.string().min(1, "Επίλεξε πελάτη."),
+    customerId: z
+      .string()
+      .min(1, "Παρακαλούμε επιλέξτε πελάτη για να συνεχίσετε."),
 
-    serviceIds: z.array(z.string()).min(1, "Επίλεξε τουλάχιστον μία υπηρεσία."),
+    serviceIds: z.array(z.string()).min(1, "Επέλεξε τουλάχιστον μία υπηρεσία."),
 
-    sourceId: z.string().min(1, "Επίλεξε πηγή κράτησης."),
+    sourceId: z.string().min(1, "Επέλεξε πηγή κράτησης."),
 
     bookingDate: z
       .date({
-        error: "Επίλεξε ημερομηνία.",
+        error: "Επέλεξε ημερομηνία.",
       })
       .optional(),
 
@@ -20,7 +22,7 @@ export const bookingSchema = z
   })
   .refine((data) => data.bookingDate !== undefined, {
     path: ["bookingDate"],
-    message: "Επίλεξε ημερομηνία.",
+    message: "Επέλεξε ημερομηνία.",
   });
 
 export type BookingFormValues = z.infer<typeof bookingSchema>;
