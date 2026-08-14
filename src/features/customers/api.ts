@@ -2,11 +2,23 @@ import { CreateCustomerInput, Customer, UpdateCustomerInput } from "./types";
 
 //Fetch customers
 
-export async function getCustomers(): Promise<Customer[]> {
-  const response = await fetch("/api/customers");
-  if (!response.ok) {
-    throw new Error("Failed to load customers");
+export async function getCustomers(search?: string): Promise<Customer[]> {
+  const params = new URLSearchParams();
+
+  if (search?.trim()) {
+    params.set("search", search.trim());
   }
+
+  const query = params.toString();
+
+  const response = await fetch(
+    query ? `/api/customers?${query}` : "/api/customers",
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch customers");
+  }
+
   return response.json();
 }
 
