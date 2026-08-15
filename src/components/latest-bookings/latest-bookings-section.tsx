@@ -63,7 +63,9 @@ export function LatestBookingsSection() {
               <LatestBookingCard appointment={appointment} />
             </button>
           ))
-        ) : null}
+        ) : (
+          <ErrorState title="Δεν υπάρχουν διαθέσιμα ραντεβού." message="" />
+        )}
       </div>
 
       {/* Right sheet */}
