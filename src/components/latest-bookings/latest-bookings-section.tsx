@@ -21,7 +21,9 @@ export function LatestBookingsSection() {
   const upcomingAppointments =
     appointments
       ?.filter(
-        (appointment) => new Date(appointment.startDateTime) >= new Date(),
+        (appointment) =>
+          appointment.status === "CONFIRMED" &&
+          new Date(appointment.startDateTime) >= new Date(),
       )
       .slice(0, 3) ?? [];
 
@@ -50,7 +52,7 @@ export function LatestBookingsSection() {
         ) : isError ? (
           <ErrorState message="Αδυναμία φόρτωσης ραντεβού" />
         ) : upcomingAppointments && upcomingAppointments?.length > 0 ? (
-          appointments?.map((appointment: Appointment) => (
+          upcomingAppointments?.map((appointment: Appointment) => (
             <button
               key={appointment?.id}
               type="button"
@@ -73,7 +75,10 @@ export function LatestBookingsSection() {
         <SheetContent className="h-dvh w-full overflow-y-auto p-0 md:h-[calc(100dvh-2rem)] md:rounded-2xl lg:h-full lg:rounded-none">
           <BackHeader title="Λεπτομέρειες Ραντεβού" />
 
-          <BookingDetails appointment={selectedAppointment} />
+          <BookingDetails
+            appointment={selectedAppointment}
+            onClose={() => setSheetOpen(false)}
+          />
         </SheetContent>
       </Sheet>
     </>
