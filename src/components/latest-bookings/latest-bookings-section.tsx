@@ -5,14 +5,18 @@ import { Eye, EyeOff } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import BackHeader from "../sheet/sheet-header";
 import BookingDetails from "../booking/booking-details";
+import { useAppointments } from "@/features/appointments/queries";
+import { Appointment } from "@/features/appointments/types";
+import { LatestBookingCardSkeleton } from "./latest-booking-card-skeleton";
+import ErrorState from "../shared/error-state";
 
 export function LatestBookingsSection() {
   const [showSection, setShowSection] = useState(true);
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
 
-  const handleBookingClick = () => {
-    setSheetOpen(true);
-  };
+  const { data: appointments, isLoading, isError } = useAppointments();
 
   return (
     <>
@@ -34,23 +38,33 @@ export function LatestBookingsSection() {
       </div>
 
       <div className={`${showSection ? "block" : "hidden"}`}>
-        <button
-          type="button"
-          className="appearance-none border-none bg-transparent text-left w-full"
-          onClick={() => handleBookingClick()}
-        >
-          <LatestBookingCard />
-        </button>
-        <LatestBookingCard />
-        <LatestBookingCard />
+        {isLoading ? (
+          <LatestBookingCardSkeleton />
+        ) : isError ? (
+          <ErrorState message="Αδυναμία φόρτωσης ραντεβού" />
+        ) : appointments && appointments?.length > 0 ? (
+          appointments?.map((appointment: Appointment) => (
+            <button
+              key={appointment?.id}
+              type="button"
+              className="appearance-none border-none bg-transparent text-left w-full"
+              onClick={() => {
+                setSelectedAppointment(appointment);
+                setSheetOpen(true);
+              }}
+            >
+              <LatestBookingCard appointment={appointment} />
+            </button>
+          ))
+        ) : null}
       </div>
 
       {/* Right sheet */}
       <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="h-[100dvh] w-full overflow-y-auto p-0 md:h-[calc(100dvh-2rem)] md:rounded-2xl lg:h-full lg:rounded-none">
+        <SheetContent className="h-dvh w-full overflow-y-auto p-0 md:h-[calc(100dvh-2rem)] md:rounded-2xl lg:h-full lg:rounded-none">
           <BackHeader title="Λεπτομέρειες Ραντεβού" />
 
-          <BookingDetails />
+          <BookingDetails appointment={selectedAppointment} />
         </SheetContent>
       </Sheet>
     </>
