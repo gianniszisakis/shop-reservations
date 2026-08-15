@@ -18,6 +18,11 @@ export function LatestBookingsSection() {
 
   const { data: appointments, isLoading, isError } = useAppointments();
 
+  const upcomingAppointments =
+    appointments?.filter(
+      (appointment) => new Date(appointment.startDateTime) >= new Date(),
+    ) ?? [];
+
   return (
     <>
       <div className="my-4 flex items-center">
@@ -42,7 +47,7 @@ export function LatestBookingsSection() {
           <LatestBookingCardSkeleton />
         ) : isError ? (
           <ErrorState message="Αδυναμία φόρτωσης ραντεβού" />
-        ) : appointments && appointments?.length > 0 ? (
+        ) : upcomingAppointments && upcomingAppointments?.length > 0 ? (
           appointments?.map((appointment: Appointment) => (
             <button
               key={appointment?.id}
