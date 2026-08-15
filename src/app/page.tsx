@@ -35,7 +35,7 @@ export default function Home() {
         avatarAlt="After Glow Logo"
         calendarColor="text-pink-600"
         infoTextboxBgColor="bg-pink-50"
-        textInfoOne={`${activeAppointments?.length} ενεργά ραντεβού`}
+        textInfoOne={`${activeAppointments?.length} ${activeAppointments?.length > 1 ? "ενεργά" : "ενεργό"} ραντεβού`}
         textInfoTwo={`Σήμερα: ${todayAppointments?.length} ραντεβού`}
         isLoading={isLoading}
         isError={isError}
