@@ -2,6 +2,7 @@ import { NewBookingButton } from "../new-booking/new-booking-button";
 import HeaderAvatar from "./header-avatar";
 import HeaderHeading from "./header-heading";
 import HeaderInfoBox from "./header-info-box";
+import HeaderInfoBoxSkeleton from "./header-info-box-skeleton";
 import { LogoutButton } from "./header-logout-button";
 
 interface HeaderProps {
@@ -13,6 +14,8 @@ interface HeaderProps {
   infoTextboxBgColor: string;
   textInfoOne: string;
   textInfoTwo: string;
+  isLoading: boolean;
+  isError: boolean;
 }
 
 export default function Header({
@@ -24,6 +27,8 @@ export default function Header({
   infoTextboxBgColor,
   textInfoOne,
   textInfoTwo,
+  isError,
+  isLoading,
 }: HeaderProps) {
   return (
     <header className="overflow-hidden rounded-3xl border bg-card shadow-sm">
@@ -46,16 +51,25 @@ export default function Header({
               <HeaderHeading title={heroTitle} />
 
               <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                <HeaderInfoBox
-                  bgColor={infoTextboxBgColor}
-                  calendarColor={calendarColor}
-                  textInfo={textInfoOne}
-                />
-                <HeaderInfoBox
-                  bgColor={infoTextboxBgColor}
-                  calendarColor={calendarColor}
-                  textInfo={textInfoTwo}
-                />
+                {isLoading ? (
+                  <div className="flex flex-wrap items-center gap-4">
+                    <HeaderInfoBoxSkeleton />
+                    <HeaderInfoBoxSkeleton />
+                  </div>
+                ) : isError ? null : (
+                  <>
+                    <HeaderInfoBox
+                      bgColor={infoTextboxBgColor}
+                      calendarColor={calendarColor}
+                      textInfo={textInfoOne}
+                    />
+                    <HeaderInfoBox
+                      bgColor={infoTextboxBgColor}
+                      calendarColor={calendarColor}
+                      textInfo={textInfoTwo}
+                    />
+                  </>
+                )}
               </div>
             </div>
           </div>
