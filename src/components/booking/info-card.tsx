@@ -16,7 +16,7 @@ export default function InfoCard({
         </span>
       </div>
 
-      <p className="text-base font-medium">{value}</p>
+      <p className="text-base font-medium whitespace-pre-line">{value}</p>
     </div>
   );
 }

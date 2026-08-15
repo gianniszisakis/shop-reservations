@@ -4,18 +4,25 @@ import ActionButtons from "./action-buttons";
 import BookingNotes from "./booking-notes";
 import AppointmentDetailsSection from "./appointment-details-section";
 import CustomerDetailsSection from "./customer-details-section";
+import { Appointment } from "@/features/appointments/types";
 
-export default function BookingDetails() {
+interface LatestBookingDetailsProps {
+  appointment: Appointment | null;
+}
+
+export default function BookingDetails({
+  appointment,
+}: LatestBookingDetailsProps) {
   return (
     <div className="space-y-4 p-8">
       {/* Customer Info */}
-      <CustomerDetailsSection />
+      <CustomerDetailsSection appointment={appointment} />
 
       {/* Appointment */}
-      <AppointmentDetailsSection />
+      <AppointmentDetailsSection appointment={appointment} />
 
       {/* Notes */}
-      <BookingNotes notes="H πελάτισσα θέλει ξύλο" />
+      {appointment?.notes && <BookingNotes notes={appointment?.notes ?? "-"} />}
 
       <Separator />
 
