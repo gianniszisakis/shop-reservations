@@ -73,7 +73,10 @@ export function LatestBookingsSection() {
         <SheetContent className="h-dvh w-full overflow-y-auto p-0 md:h-[calc(100dvh-2rem)] md:rounded-2xl lg:h-full lg:rounded-none">
           <BackHeader title="Λεπτομέρειες Ραντεβού" />
 
-          <BookingDetails appointment={selectedAppointment} />
+          <BookingDetails
+            appointment={selectedAppointment}
+            onClose={() => setSheetOpen(false)}
+          />
         </SheetContent>
       </Sheet>
     </>

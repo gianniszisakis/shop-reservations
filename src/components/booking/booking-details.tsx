@@ -8,10 +8,12 @@ import { Appointment } from "@/features/appointments/types";
 
 interface LatestBookingDetailsProps {
   appointment: Appointment | null;
+  onClose: () => void;
 }
 
 export default function BookingDetails({
   appointment,
+  onClose,
 }: LatestBookingDetailsProps) {
   return (
     <div className="space-y-4 p-8">
@@ -26,7 +28,7 @@ export default function BookingDetails({
 
       <Separator />
 
-      <ActionButtons />
+      <ActionButtons appointment={appointment} onCancelSuccess={onClose} />
     </div>
   );
 }
