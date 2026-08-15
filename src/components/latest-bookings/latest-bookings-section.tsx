@@ -19,9 +19,11 @@ export function LatestBookingsSection() {
   const { data: appointments, isLoading, isError } = useAppointments();
 
   const upcomingAppointments =
-    appointments?.filter(
-      (appointment) => new Date(appointment.startDateTime) >= new Date(),
-    ) ?? [];
+    appointments
+      ?.filter(
+        (appointment) => new Date(appointment.startDateTime) >= new Date(),
+      )
+      .slice(0, 3) ?? [];
 
   return (
     <>
