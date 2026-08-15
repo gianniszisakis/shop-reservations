@@ -21,7 +21,9 @@ export function LatestBookingsSection() {
   const upcomingAppointments =
     appointments
       ?.filter(
-        (appointment) => new Date(appointment.startDateTime) >= new Date(),
+        (appointment) =>
+          appointment.status === "CONFIRMED" &&
+          new Date(appointment.startDateTime) >= new Date(),
       )
       .slice(0, 3) ?? [];
 
@@ -50,7 +52,7 @@ export function LatestBookingsSection() {
         ) : isError ? (
           <ErrorState message="Αδυναμία φόρτωσης ραντεβού" />
         ) : upcomingAppointments && upcomingAppointments?.length > 0 ? (
-          appointments?.map((appointment: Appointment) => (
+          upcomingAppointments?.map((appointment: Appointment) => (
             <button
               key={appointment?.id}
               type="button"
