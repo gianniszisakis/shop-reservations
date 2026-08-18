@@ -28,9 +28,7 @@ export default function BookingDetails({
       <BookingForm
         key={appointment?.id}
         appointment={appointment}
-        onSuccess={() => {
-          setIsEditing(false);
-        }}
+        onSuccess={onClose}
       />
     );
   }
