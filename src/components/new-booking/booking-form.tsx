@@ -14,13 +14,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { bookingSchema, type BookingFormValues } from "./booking-schema";
 import { toast } from "sonner";
 import { useCreateAppointment } from "@/features/appointments/mutations";
+import { Appointment } from "@/features/appointments/types";
+import { getAppointmentDateTime } from "@/lib/utils";
+import CustomerDisplay from "./customer-display";
 
 interface BookingFormProps {
+  appointment?: Appointment | null;
   onSuccess: () => void;
 }
 
-export default function BookingForm({ onSuccess }: BookingFormProps) {
+export default function BookingForm({
+  onSuccess,
+  appointment,
+}: BookingFormProps) {
   const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
+
+  const appointmentDateTime = appointment
+    ? getAppointmentDateTime(appointment.startDateTime)
+    : null;
 
   const createAppointment = useCreateAppointment();
 
@@ -28,11 +39,17 @@ export default function BookingForm({ onSuccess }: BookingFormProps) {
     resolver: zodResolver(bookingSchema),
 
     defaultValues: {
-      customerId: "",
-      serviceIds: [],
-      sourceId: "",
-      bookingTime: "",
-      notes: "",
+      customerId: appointment?.customerId ?? "",
+
+      serviceIds: appointment?.services.map(({ service }) => service.id) ?? [],
+
+      sourceId: appointment?.sourceId ?? "",
+
+      bookingDate: appointmentDateTime?.date ?? undefined,
+
+      bookingTime: appointmentDateTime?.time ?? "",
+
+      notes: appointment?.notes ?? "",
     },
   });
 
@@ -150,7 +167,9 @@ export default function BookingForm({ onSuccess }: BookingFormProps) {
       onSubmit={form.handleSubmit(onSubmit, onInvalid)}
       className="space-y-6 p-4 sm:p-6 lg:p-8"
     >
-      {!isCreatingCustomer ? (
+      {appointment ? (
+        <CustomerDisplay customerName={appointment?.customer?.fullName} />
+      ) : !isCreatingCustomer ? (
         <CustomerSearch
           value={customerId}
           onChange={(value) =>
