@@ -13,26 +13,47 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { bookingSchema, type BookingFormValues } from "./booking-schema";
 import { toast } from "sonner";
-import { useCreateAppointment } from "@/features/appointments/mutations";
+import {
+  useCreateAppointment,
+  useUpdateAppointment,
+} from "@/features/appointments/mutations";
+import { Appointment } from "@/features/appointments/types";
+import { getAppointmentDateTime } from "@/lib/utils";
+import CustomerDisplay from "./customer-display";
 
 interface BookingFormProps {
+  appointment?: Appointment | null;
   onSuccess: () => void;
 }
 
-export default function BookingForm({ onSuccess }: BookingFormProps) {
+export default function BookingForm({
+  onSuccess,
+  appointment,
+}: BookingFormProps) {
   const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
 
+  const appointmentDateTime = appointment
+    ? getAppointmentDateTime(appointment.startDateTime)
+    : null;
+
   const createAppointment = useCreateAppointment();
+  const updateAppointment = useUpdateAppointment();
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
 
     defaultValues: {
-      customerId: "",
-      serviceIds: [],
-      sourceId: "",
-      bookingTime: "",
-      notes: "",
+      customerId: appointment?.customerId ?? "",
+
+      serviceIds: appointment?.services.map(({ service }) => service.id) ?? [],
+
+      sourceId: appointment?.sourceId ?? "",
+
+      bookingDate: appointmentDateTime?.date ?? undefined,
+
+      bookingTime: appointmentDateTime?.time ?? "",
+
+      notes: appointment?.notes ?? "",
     },
   });
 
@@ -84,37 +105,65 @@ export default function BookingForm({ onSuccess }: BookingFormProps) {
 
     startDateTime.setHours(hours, minutes, 0, 0);
 
-    createAppointment.mutate(
-      {
-        customerId: values.customerId,
-        sourceId: values.sourceId,
-        serviceIds: values.serviceIds,
-        startDateTime: startDateTime.toISOString(),
-        notes: values.notes?.trim() || null,
-      },
-      {
-        onSuccess: () => {
-          toast.success("Το ραντεβού δημιουργήθηκε", {
-            description: "Το ραντεβού αποθηκεύτηκε επιτυχώς.",
-          });
+    const payload = {
+      customerId: values.customerId,
+      sourceId: values.sourceId,
+      serviceIds: values.serviceIds,
+      startDateTime: startDateTime.toISOString(),
+      notes: values.notes?.trim() || null,
+    };
 
-          form.reset();
-
-          setIsCreatingCustomer(false);
-
-          onSuccess();
+    if (appointment) {
+      updateAppointment.mutate(
+        {
+          id: appointment.id,
+          input: payload,
         },
+        {
+          onSuccess: () => {
+            toast.success("Το ραντεβού ενημερώθηκε", {
+              description: "Οι αλλαγές αποθηκεύτηκαν επιτυχώς.",
+            });
 
-        onError: (error) => {
-          toast.error("Αποτυχία δημιουργίας ραντεβού", {
-            description:
-              error instanceof Error
-                ? error.message
-                : "Παρουσιάστηκε κάποιο πρόβλημα.",
-          });
+            onSuccess();
+          },
+
+          onError: (error) => {
+            toast.error("Αποτυχία ενημέρωσης", {
+              description:
+                error instanceof Error
+                  ? error.message
+                  : "Παρουσιάστηκε κάποιο πρόβλημα.",
+            });
+          },
         },
+      );
+
+      return;
+    }
+
+    createAppointment.mutate(payload, {
+      onSuccess: () => {
+        toast.success("Το ραντεβού δημιουργήθηκε", {
+          description: "Το ραντεβού αποθηκεύτηκε επιτυχώς.",
+        });
+
+        form.reset();
+
+        setIsCreatingCustomer(false);
+
+        onSuccess();
       },
-    );
+
+      onError: (error) => {
+        toast.error("Αποτυχία δημιουργίας ραντεβού", {
+          description:
+            error instanceof Error
+              ? error.message
+              : "Παρουσιάστηκε κάποιο πρόβλημα.",
+        });
+      },
+    });
   }
 
   const onInvalid = () => {
@@ -150,7 +199,9 @@ export default function BookingForm({ onSuccess }: BookingFormProps) {
       onSubmit={form.handleSubmit(onSubmit, onInvalid)}
       className="space-y-6 p-4 sm:p-6 lg:p-8"
     >
-      {!isCreatingCustomer ? (
+      {appointment ? (
+        <CustomerDisplay customerName={appointment?.customer?.fullName} />
+      ) : !isCreatingCustomer ? (
         <CustomerSearch
           value={customerId}
           onChange={(value) =>
@@ -221,9 +272,14 @@ export default function BookingForm({ onSuccess }: BookingFormProps) {
 
         <Button
           type="submit"
-          className="w-full sm:w-auto bg-pink-600 hover:bg-pink-500"
+          disabled={createAppointment.isPending || updateAppointment.isPending}
+          className="w-full bg-pink-600 hover:bg-pink-500 sm:w-auto"
         >
-          Αποθήκευση
+          {createAppointment.isPending || updateAppointment.isPending
+            ? "Αποθήκευση..."
+            : appointment
+              ? "Αποθήκευση αλλαγών"
+              : "Αποθήκευση"}
         </Button>
       </div>
     </form>

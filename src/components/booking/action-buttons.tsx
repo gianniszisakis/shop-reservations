@@ -6,11 +6,13 @@ import { Appointment } from "@/features/appointments/types";
 
 interface ActionButtonsProps {
   appointment: Appointment | null;
+  onEdit: () => void;
   onCancelSuccess: () => void;
 }
 
 export default function ActionButtons({
   appointment,
+  onEdit,
   onCancelSuccess,
 }: ActionButtonsProps) {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
@@ -21,7 +23,7 @@ export default function ActionButtons({
   return (
     <>
       <div className="flex gap-4">
-        <Button className="flex-1" size="lg">
+        <Button className="flex-1" size="lg" onClick={onEdit}>
           <Pencil className="mr-2 h-4 w-4" />
           Επεξεργασία
         </Button>
