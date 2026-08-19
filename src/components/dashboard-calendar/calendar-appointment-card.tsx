@@ -3,6 +3,8 @@
 import { Clock3, User } from "lucide-react";
 
 import type { Appointment } from "@/features/appointments/types";
+import { Badge } from "@/components/ui/badge";
+import { appointmentStatusMap } from "@/features/appointments/status";
 
 interface CalendarAppointmentCardProps {
   appointment: Appointment;
@@ -26,6 +28,8 @@ export default function CalendarAppointmentCard({
     hour12: false,
     timeZone: "Europe/Athens",
   }).format(new Date(appointment.endDateTime));
+
+  const status = appointmentStatusMap[appointment?.status];
 
   return (
     <button
@@ -58,8 +62,14 @@ export default function CalendarAppointmentCard({
             </span>
           </div>
 
-          <div className="mt-3 text-xs text-muted-foreground">
-            {appointment.source.name}
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <span className="text-xs text-muted-foreground">
+              {appointment.source.name}
+            </span>
+
+            <Badge variant="outline" className={`shrink-0 ${status.className}`}>
+              {status.label}
+            </Badge>
           </div>
         </div>
       </div>
