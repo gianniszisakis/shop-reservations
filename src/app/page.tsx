@@ -1,4 +1,5 @@
 "use client";
+import DashboardCalendar from "@/components/dashboard-calendar/dashboard-calendar";
 import Header from "@/components/header/header";
 import { LatestBookingsSection } from "@/components/latest-bookings/latest-bookings-section";
 import { useAppointments } from "@/features/appointments/queries";
@@ -42,6 +43,8 @@ export default function Home() {
       />
       <div className="mx-5 sm:mx-10">
         <LatestBookingsSection />
+
+        <DashboardCalendar />
       </div>
     </>
   );
