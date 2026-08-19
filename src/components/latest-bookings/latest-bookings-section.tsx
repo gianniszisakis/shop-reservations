@@ -46,7 +46,7 @@ export function LatestBookingsSection() {
         </button>
       </div>
 
-      <div className={`${showSection ? "block" : "hidden"}`}>
+      <div className={`${showSection ? "block" : "hidden"} pb-4`}>
         {isLoading ? (
           <LatestBookingCardSkeleton />
         ) : isError ? (
