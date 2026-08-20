@@ -28,7 +28,7 @@ export default function Settings() {
         isError={isError}
       />
 
-      <div className="mx-5 sm:mx-10">
+      <div className="sm:mx-10">
         <SettingsPage />
       </div>
     </>
