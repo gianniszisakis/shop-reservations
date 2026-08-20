@@ -16,3 +16,10 @@ export function useCustomer(id: string | undefined) {
     enabled: !!id,
   });
 }
+
+export function useAllCustomers() {
+  return useQuery({
+    queryKey: ["customers"],
+    queryFn: () => getCustomers(),
+  });
+}
