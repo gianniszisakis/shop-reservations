@@ -1,103 +1,134 @@
 "use client";
 
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
+interface ManagementCardField {
+  label: string;
+  value?: string | number | null;
+}
+
 interface ManagementCardProps {
   title: string;
-  subtitle?: string;
   icon: React.ReactNode;
+  fields: ManagementCardField[];
   isActive: boolean;
-  activeLabel?: string;
-  inactiveLabel?: string;
   onEdit: () => void;
-  onDeactivate?: () => void;
-  onActivate?: () => void;
+  onDelete: () => void;
 }
 
 export default function ManagementCard({
   title,
-  subtitle,
   icon,
+  fields,
   isActive,
-  activeLabel = "Ενεργό",
-  inactiveLabel = "Ανενεργό",
   onEdit,
-  onDeactivate,
-  onActivate,
+  onDelete,
 }: ManagementCardProps) {
   return (
-    <Card className="w-full rounded-2xl p-4 transition-shadow hover:shadow-md sm:p-5">
-      <div className="flex items-start gap-4">
-        {/* Icon */}
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-pink-50 text-pink-600">
-          {icon}
-        </div>
+    <Card className="w-full overflow-hidden rounded-2xl p-0 shadow-sm transition-shadow hover:shadow-md">
+      <div className="p-4 sm:p-5">
+        {/* Header */}
+        <div className="flex items-start">
+          {/* Main entity icon */}
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-pink-50 text-pink-600">
+            {icon}
+          </div>
 
-        {/* Content */}
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <h3 className="wrap-break-word text-base font-semibold sm:text-lg">
-                {title}
-              </h3>
+          {/* Title + mobile badge */}
+          <div className="min-w-0 flex-1">
+            <h3 className="wrap-break-word text-base font-semibold leading-5 sm:text-lg">
+              {title}
+            </h3>
 
-              {subtitle && (
-                <p className="mt-1 wrap-break-word text-sm text-muted-foreground">
-                  {subtitle}
-                </p>
-              )}
-            </div>
-
+            {/* Mobile status */}
             <Badge
               variant="outline"
-              className={
+              className={`mt-2 w-fit rounded-full px-2.5 py-1 text-xs font-medium sm:hidden ${
                 isActive
-                  ? "w-fit border-green-200 bg-green-50 text-green-700"
-                  : "w-fit border-red-200 bg-red-50 text-red-700"
-              }
+                  ? "border-green-200 bg-green-50 text-green-700"
+                  : "border-muted bg-muted text-muted-foreground"
+              }`}
             >
-              {isActive ? activeLabel : inactiveLabel}
+              <span
+                className={`mr-1.5 size-1.5 rounded-full ${
+                  isActive ? "bg-green-500" : "bg-muted-foreground"
+                }`}
+              />
+
+              {isActive ? "Ενεργό" : "Ανενεργό"}
             </Badge>
           </div>
 
-          {/* Actions */}
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full rounded-xl sm:w-auto"
-              onClick={onEdit}
+          {/* Desktop status */}
+          <Badge
+            variant="outline"
+            className={`hidden shrink-0 rounded-full px-2.5 py-1 text-xs font-medium sm:flex ${
+              isActive
+                ? "border-green-200 bg-green-50 text-green-700"
+                : "border-muted bg-muted text-muted-foreground"
+            }`}
+          >
+            <span
+              className={`mr-1.5 size-1.5 rounded-full ${
+                isActive ? "bg-green-500" : "bg-muted-foreground"
+              }`}
+            />
+
+            {isActive ? "Ενεργό" : "Ανενεργό"}
+          </Badge>
+        </div>
+
+        {/* Fields */}
+        <div
+          className={`mt-5 grid grid-cols-1 gap-3 ${
+            fields.length > 1 ? "sm:grid-cols-2" : ""
+          }`}
+        >
+          {fields.map((field) => (
+            <div
+              key={field.label}
+              className="min-w-0 rounded-xl border bg-muted/20 px-4 py-3"
             >
-              <Pencil className="mr-2 h-4 w-4" />
-              Επεξεργασία
-            </Button>
+              <p className="text-xs font-medium text-muted-foreground">
+                {field.label}
+              </p>
 
-            {isActive && onDeactivate && (
-              <Button
-                type="button"
-                variant="destructive"
-                className="w-full rounded-xl sm:w-auto"
-                onClick={onDeactivate}
-              >
-                Απενεργοποίηση
-              </Button>
-            )}
+              <p className="mt-1 wrap-break-word text-sm font-semibold text-foreground">
+                {field.value === null ||
+                field.value === undefined ||
+                field.value === ""
+                  ? "-"
+                  : field.value}
+              </p>
+            </div>
+          ))}
+        </div>
 
-            {!isActive && onActivate && (
-              <Button
-                type="button"
-                variant="secondary"
-                className="w-full rounded-xl sm:w-auto"
-                onClick={onActivate}
-              >
-                Ενεργοποίηση
-              </Button>
-            )}
-          </div>
+        {/* Actions */}
+        <div className="mt-5 flex flex-col gap-2 border-t pt-4 sm:flex-row">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onEdit}
+            className="w-full rounded-xl sm:w-auto"
+          >
+            <Pencil className="mr-2 size-4" />
+            Επεξεργασία
+          </Button>
+
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={onDelete}
+            className="w-full rounded-xl sm:w-auto"
+          >
+            <Trash2 className="mr-2 size-4" />
+            Διαγραφή
+          </Button>
         </div>
       </div>
     </Card>
