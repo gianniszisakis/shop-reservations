@@ -13,14 +13,19 @@ import ManagementCard from "./management-card";
 import ManagementrCardSkeleton from "./management-card-loading";
 import { Customer } from "@/features/customers/types";
 import CustomerEditSheet from "./customer-edit-sheet";
+import DeactivateDialog from "./deactivate-dialog";
+import { useDeactivateCustomer } from "@/features/customers/mutations";
 
 export default function CustomersTab() {
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null,
   );
+  const [customerToDeactivate, setCustomerToDeactivate] =
+    useState<Customer | null>(null);
 
   const { data: customers, isLoading, isError } = useAllCustomers();
+  const deactivateCustomer = useDeactivateCustomer();
 
   const filteredCustomers = useMemo(() => {
     const value = search.trim().toLocaleLowerCase();
@@ -104,9 +109,7 @@ export default function CustomersTab() {
                   },
                 ]}
                 onEdit={() => setSelectedCustomer(customer)}
-                onDelete={() => {
-                  console.log("Delete:", customer.id);
-                }}
+                onDelete={() => setCustomerToDeactivate(customer)}
               />
             ))}
           </div>
@@ -135,6 +138,26 @@ export default function CustomersTab() {
           if (!open) {
             setSelectedCustomer(null);
           }
+        }}
+      />
+
+      <DeactivateDialog
+        entityName={customerToDeactivate?.fullName ?? ""}
+        entityLabel="τον πελάτη"
+        open={customerToDeactivate !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCustomerToDeactivate(null);
+          }
+        }}
+        onDeactivate={async () => {
+          if (!customerToDeactivate) {
+            return;
+          }
+
+          await deactivateCustomer.mutateAsync(customerToDeactivate.id);
+
+          setCustomerToDeactivate(null);
         }}
       />
     </>
