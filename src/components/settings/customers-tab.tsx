@@ -15,12 +15,14 @@ import { Customer } from "@/features/customers/types";
 import CustomerEditSheet from "./customer-edit-sheet";
 import DeactivateDialog from "./deactivate-dialog";
 import { useDeactivateCustomer } from "@/features/customers/mutations";
+import CustomerCreateSheet from "./customer-create-sheet";
 
 export default function CustomersTab() {
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null,
   );
+  const [isCreateCustomerOpen, setIsCreateCustomerOpen] = useState(false);
   const [customerToDeactivate, setCustomerToDeactivate] =
     useState<Customer | null>(null);
 
@@ -59,6 +61,7 @@ export default function CustomersTab() {
           <Button
             type="button"
             className="w-full gap-2 rounded-xl bg-pink-600 hover:bg-pink-500 sm:w-auto"
+            onClick={() => setIsCreateCustomerOpen(true)}
           >
             <Plus className="size-4" />
             Νέος πελάτης
@@ -130,6 +133,11 @@ export default function CustomersTab() {
           </div>
         )}
       </div>
+
+      <CustomerCreateSheet
+        open={isCreateCustomerOpen}
+        onOpenChange={setIsCreateCustomerOpen}
+      />
 
       <CustomerEditSheet
         customer={selectedCustomer}
