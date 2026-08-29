@@ -39,13 +39,16 @@ export async function POST(request: Request) {
       );
     }
 
+    const serviceName = name.trim();
+
     const existingService = await prisma.service.findUnique({
       where: {
-        name: name.trim(),
+        name: serviceName,
       },
     });
 
-    if (existingService) {
+    // Active service with the same name already exists.
+    if (existingService?.isActive) {
       return NextResponse.json(
         {
           error: "A service with this name already exists",
@@ -54,9 +57,29 @@ export async function POST(request: Request) {
       );
     }
 
+    // Same service exists but is inactive.
+    // Reactivate the existing record instead of creating a duplicate.
+    if (existingService) {
+      const reactivatedService = await prisma.service.update({
+        where: {
+          id: existingService.id,
+        },
+        data: {
+          price: String(parsedPrice),
+          durationMinutes,
+          isActive: true,
+        },
+      });
+
+      return NextResponse.json(reactivatedService, {
+        status: 200,
+      });
+    }
+
+    // No service with this name exists, so create a new one.
     const service = await prisma.service.create({
       data: {
-        name: name.trim(),
+        name: serviceName,
         price: String(parsedPrice),
         durationMinutes,
         isActive: true,
