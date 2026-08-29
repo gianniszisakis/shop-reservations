@@ -99,3 +99,31 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     );
   }
 }
+
+export async function DELETE(_request: Request, { params }: RouteContext) {
+  try {
+    const { id } = await params;
+
+    const service = await prisma.service.findUnique({
+      where: { id },
+    });
+
+    if (!service) {
+      return NextResponse.json({ error: "Service not found" }, { status: 404 });
+    }
+
+    const updatedService = await prisma.service.update({
+      where: { id },
+      data: {
+        isActive: false,
+      },
+    });
+
+    return NextResponse.json(updatedService);
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to deactivate service" },
+      { status: 500 },
+    );
+  }
+}
