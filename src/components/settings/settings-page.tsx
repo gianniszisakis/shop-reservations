@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Card } from "@/components/ui/card";
 import CustomersTab from "./customers-tab";
+import ServicesTab from "./services-tab";
 
 export default function SettingsPage() {
   return (
@@ -37,7 +38,7 @@ export default function SettingsPage() {
 
           <TabsContent value="services" className="mt-6">
             <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-              Services will go here.
+              <ServicesTab />
             </div>
           </TabsContent>
 
