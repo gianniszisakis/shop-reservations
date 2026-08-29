@@ -14,12 +14,14 @@ import ManagementCard from "./management-card";
 import ServiceEditSheet from "./service-edit-sheet";
 import DeactivateDialog from "./deactivate-dialog";
 import { useDeactivateService } from "@/features/services/mutations";
+import ServiceCreateSheet from "./service-create-sheet";
 
 export default function ServicesTab() {
   const [search, setSearch] = useState("");
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [serviceToDeactivate, setServiceToDeactivate] =
     useState<Service | null>(null);
+  const [isCreateServiceOpen, setIsCreateServiceOpen] = useState(false);
 
   const { data: services, isLoading, isError } = useServices();
   const deactivateService = useDeactivateService();
@@ -52,6 +54,7 @@ export default function ServicesTab() {
           <Button
             type="button"
             className="w-full rounded-xl bg-pink-600 hover:bg-pink-500 sm:w-auto"
+            onClick={() => setIsCreateServiceOpen(true)}
           >
             <Plus className="mr-2 size-4" />
             Νέα υπηρεσία
@@ -152,6 +155,21 @@ export default function ServicesTab() {
           await deactivateService.mutateAsync(serviceToDeactivate.id);
 
           setServiceToDeactivate(null);
+        }}
+      />
+
+      <ServiceCreateSheet
+        open={isCreateServiceOpen}
+        onOpenChange={setIsCreateServiceOpen}
+      />
+
+      <ServiceEditSheet
+        service={selectedService}
+        open={selectedService !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedService(null);
+          }
         }}
       />
     </>
