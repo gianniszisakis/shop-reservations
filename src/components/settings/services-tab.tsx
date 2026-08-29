@@ -12,12 +12,17 @@ import { Input } from "@/components/ui/input";
 import ErrorState from "@/components/shared/error-state";
 import ManagementCard from "./management-card";
 import ServiceEditSheet from "./service-edit-sheet";
+import DeactivateDialog from "./deactivate-dialog";
+import { useDeactivateService } from "@/features/services/mutations";
 
 export default function ServicesTab() {
   const [search, setSearch] = useState("");
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [serviceToDeactivate, setServiceToDeactivate] =
+    useState<Service | null>(null);
 
   const { data: services, isLoading, isError } = useServices();
+  const deactivateService = useDeactivateService();
 
   const filteredServices = useMemo(() => {
     const value = search.trim().toLocaleLowerCase();
@@ -98,9 +103,7 @@ export default function ServicesTab() {
                   },
                 ]}
                 onEdit={() => setSelectedService(service)}
-                onDelete={() => {
-                  console.log("Deactivate service:", service.id);
-                }}
+                onDelete={() => setServiceToDeactivate(service)}
               />
             ))}
           </div>
@@ -129,6 +132,26 @@ export default function ServicesTab() {
           if (!open) {
             setSelectedService(null);
           }
+        }}
+      />
+
+      <DeactivateDialog
+        entityName={serviceToDeactivate?.name ?? ""}
+        entityLabel="H υπηρεσία"
+        open={serviceToDeactivate !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setServiceToDeactivate(null);
+          }
+        }}
+        onDeactivate={async () => {
+          if (!serviceToDeactivate) {
+            return;
+          }
+
+          await deactivateService.mutateAsync(serviceToDeactivate.id);
+
+          setServiceToDeactivate(null);
         }}
       />
     </>
