@@ -1,23 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 
 import Header from "@/components/header/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+
 import { useAppointmentStats } from "@/features/appointments/use-appointments-stats";
 import { useAppointments } from "@/features/appointments/queries";
+import type { Appointment } from "@/features/appointments/types";
+
+import { LatestBookingCard } from "@/components/latest-bookings/latest-booking-card";
+import { LatestBookingCardSkeleton } from "@/components/latest-bookings/latest-booking-card-skeleton";
+import ErrorState from "@/components/shared/error-state";
+import BackHeader from "@/components/sheet/sheet-header";
+import BookingDetails from "@/components/booking/booking-details";
 
 export default function AppointmentsPage() {
   const [view, setView] = useState<"all" | "active">("all");
   const [search, setSearch] = useState("");
 
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
+
+  const [isSheetOpen, setSheetOpen] = useState(false);
+
   const { data: appointments, isLoading, isError } = useAppointments();
 
   const { activeAppointments, todayAppointments } =
     useAppointmentStats(appointments);
+
+  const filteredAppointments = useMemo(() => {
+    const searchValue = search.trim().toLocaleLowerCase();
+
+    return (
+      appointments
+        ?.filter((appointment) => {
+          if (view === "active") {
+            return appointment.status === "CONFIRMED";
+          }
+
+          return true;
+        })
+        .filter((appointment) => {
+          if (!searchValue) {
+            return true;
+          }
+
+          return (
+            appointment.customer?.fullName
+              ?.toLocaleLowerCase()
+              .includes(searchValue) ||
+            appointment.customer?.phone
+              ?.toLocaleLowerCase()
+              .includes(searchValue) ||
+            appointment.customer?.email
+              ?.toLocaleLowerCase()
+              .includes(searchValue)
+          );
+        }) ?? []
+    );
+  }, [appointments, search, view]);
 
   return (
     <>
@@ -28,8 +74,10 @@ export default function AppointmentsPage() {
         avatarAlt="After Glow Logo"
         calendarColor="text-pink-600"
         infoTextboxBgColor="bg-pink-50"
-        textInfoOne={`${activeAppointments?.length} ${activeAppointments?.length > 1 ? "ενεργά" : "ενεργό"} ραντεβού`}
-        textInfoTwo={`Σήμερα: ${todayAppointments?.length} ραντεβού`}
+        textInfoOne={`${activeAppointments.length} ${
+          activeAppointments.length > 1 ? "ενεργά" : "ενεργό"
+        } ραντεβού`}
+        textInfoTwo={`Σήμερα: ${todayAppointments.length} ραντεβού`}
         isLoading={isLoading}
         isError={isError}
       />
@@ -41,12 +89,16 @@ export default function AppointmentsPage() {
             <h1 className="text-3xl font-bold tracking-tight">
               Όλα τα ραντεβού
             </h1>
+
+            <p className="mt-1 text-sm text-muted-foreground">
+              Προβολή και διαχείριση όλων των ραντεβού.
+            </p>
           </div>
 
           {/* Filters */}
           <Card className="rounded-2xl p-3 sm:p-4">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              {/* View tabs */}
+              {/* View */}
               <div className="grid w-full grid-cols-2 rounded-xl bg-muted/50 p-1 lg:w-auto">
                 <Button
                   type="button"
@@ -89,10 +141,64 @@ export default function AppointmentsPage() {
             </div>
           </Card>
 
-          {/* Appointments will go here */}
-          <div className="space-y-4">{/* LatestBookingCard */}</div>
+          {/* Appointments */}
+          <div className="space-y-4">
+            {isLoading ? (
+              <>
+                <LatestBookingCardSkeleton />
+                <LatestBookingCardSkeleton />
+                <LatestBookingCardSkeleton />
+              </>
+            ) : isError ? (
+              <ErrorState message="Αδυναμία φόρτωσης ραντεβού" />
+            ) : filteredAppointments.length > 0 ? (
+              filteredAppointments.map((appointment: Appointment) => (
+                <button
+                  key={appointment.id}
+                  type="button"
+                  className="w-full appearance-none border-0 bg-transparent p-0 text-left"
+                  onClick={() => {
+                    setSelectedAppointment(appointment);
+                    setSheetOpen(true);
+                  }}
+                >
+                  <LatestBookingCard appointment={appointment} />
+                </button>
+              ))
+            ) : (
+              <ErrorState
+                title={
+                  view === "active"
+                    ? "Δεν υπάρχουν ενεργά ραντεβού."
+                    : "Δεν υπάρχουν ραντεβού."
+                }
+                message=""
+              />
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Appointment details */}
+      <Sheet
+        open={isSheetOpen}
+        onOpenChange={(open) => {
+          setSheetOpen(open);
+
+          if (!open) {
+            setSelectedAppointment(null);
+          }
+        }}
+      >
+        <SheetContent className="h-dvh w-full overflow-y-auto p-0 md:h-[calc(100dvh-2rem)] md:rounded-2xl lg:h-full lg:rounded-none">
+          <BackHeader title="Λεπτομέρειες Ραντεβού" />
+
+          <BookingDetails
+            appointment={selectedAppointment}
+            onClose={() => setSheetOpen(false)}
+          />
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
