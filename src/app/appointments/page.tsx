@@ -18,6 +18,7 @@ import { LatestBookingCardSkeleton } from "@/components/latest-bookings/latest-b
 import ErrorState from "@/components/shared/error-state";
 import BackHeader from "@/components/sheet/sheet-header";
 import BookingDetails from "@/components/booking/booking-details";
+import { getAppointmentStatus } from "@/features/appointments/utils";
 
 export default function AppointmentsPage() {
   const [view, setView] = useState<"all" | "active">("all");
@@ -28,42 +29,49 @@ export default function AppointmentsPage() {
 
   const [isSheetOpen, setSheetOpen] = useState(false);
 
-  const { data: appointments, isLoading, isError } = useAppointments();
+  const {
+    data: appointments,
+    isLoading,
+    isError,
+    dataUpdatedAt,
+  } = useAppointments();
 
   const { activeAppointments, todayAppointments } =
     useAppointmentStats(appointments);
 
+  const appointmentStatus = useMemo(() => {
+    return (
+      appointments?.map((appointment) => ({
+        appointment,
+        status: getAppointmentStatus(appointment, new Date(dataUpdatedAt)),
+      })) ?? []
+    );
+  }, [appointments, dataUpdatedAt]);
+
   const filteredAppointments = useMemo(() => {
     const searchValue = search.trim().toLocaleLowerCase();
 
-    return (
-      appointments
-        ?.filter((appointment) => {
-          if (view === "active") {
-            return appointment.status === "CONFIRMED";
-          }
+    const source =
+      view === "active"
+        ? appointmentStatus.filter(({ status }) => status === "CONFIRMED")
+        : appointmentStatus;
 
-          return true;
-        })
-        .filter((appointment) => {
-          if (!searchValue) {
-            return true;
-          }
+    return source.filter(({ appointment }) => {
+      if (!searchValue) {
+        return true;
+      }
 
-          return (
-            appointment.customer?.fullName
-              ?.toLocaleLowerCase()
-              .includes(searchValue) ||
-            appointment.customer?.phone
-              ?.toLocaleLowerCase()
-              .includes(searchValue) ||
-            appointment.customer?.email
-              ?.toLocaleLowerCase()
-              .includes(searchValue)
-          );
-        }) ?? []
-    );
-  }, [appointments, search, view]);
+      return (
+        appointment.customer?.fullName
+          ?.toLocaleLowerCase()
+          .includes(searchValue) ||
+        appointment.customer?.phone
+          ?.toLocaleLowerCase()
+          .includes(searchValue) ||
+        appointment.customer?.email?.toLocaleLowerCase().includes(searchValue)
+      );
+    });
+  }, [appointmentStatus, search, view]);
 
   return (
     <>
@@ -152,7 +160,7 @@ export default function AppointmentsPage() {
             ) : isError ? (
               <ErrorState message="Αδυναμία φόρτωσης ραντεβού" />
             ) : filteredAppointments.length > 0 ? (
-              filteredAppointments.map((appointment: Appointment) => (
+              filteredAppointments.map(({ appointment, status }) => (
                 <button
                   key={appointment.id}
                   type="button"
@@ -162,7 +170,10 @@ export default function AppointmentsPage() {
                     setSheetOpen(true);
                   }}
                 >
-                  <LatestBookingCard appointment={appointment} />
+                  <LatestBookingCard
+                    appointment={appointment}
+                    status={status}
+                  />
                 </button>
               ))
             ) : (

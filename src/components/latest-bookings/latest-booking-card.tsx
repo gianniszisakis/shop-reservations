@@ -1,12 +1,19 @@
 import { Card } from "@/components/ui/card";
 import { Appointment } from "@/features/appointments/types";
 import { Calendar, User, Briefcase, Globe, ChevronRight } from "lucide-react";
+import { Badge } from "../ui/badge";
+import { appointmentStatusMap } from "@/features/appointments/utils";
 
 interface LatestBookingCardProps {
   appointment: Appointment;
+  status?: Appointment["status"];
 }
 
-export function LatestBookingCard({ appointment }: LatestBookingCardProps) {
+export function LatestBookingCard({
+  appointment,
+  status = appointment.status,
+}: LatestBookingCardProps) {
+  const statusInfo = appointmentStatusMap[status];
   return (
     <Card className="w-full overflow-hidden transition-shadow duration-200 hover:shadow-lg p-0 mb-4">
       <div className="flex">
@@ -85,7 +92,15 @@ export function LatestBookingCard({ appointment }: LatestBookingCardProps) {
               {appointment?.source?.name}
             </p>
           </div>
+
+          <Badge
+            variant="outline"
+            className={`shrink-0 ${statusInfo.className}`}
+          >
+            {statusInfo.label}
+          </Badge>
         </div>
+
         {/* Right-center arrow */}
         <div className="flex shrink-0 items-center pr-4 pl-2 text-muted-foreground">
           <ChevronRight className="size-5" aria-hidden="true" />
