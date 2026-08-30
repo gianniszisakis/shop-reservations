@@ -4,6 +4,7 @@ import HeaderHeading from "./header-heading";
 import HeaderInfoBox from "./header-info-box";
 import HeaderInfoBoxSkeleton from "./header-info-box-skeleton";
 import { LogoutButton } from "./header-logout-button";
+import { SettingsButton } from "./settings-button";
 
 interface HeaderProps {
   heroBgUrl: string;
@@ -75,9 +76,20 @@ export default function Header({
           </div>
 
           {/* Right */}
-          <div className="flex items-center gap-4 pb-2">
-            <NewBookingButton />
-            <LogoutButton />
+          <div className="overflow-x-auto pb-2 sm:overflow-visible">
+            <div className="flex items-center gap-4">
+              <div className="shrink-0">
+                <NewBookingButton />
+              </div>
+
+              <div className="shrink-0">
+                <SettingsButton />
+              </div>
+
+              <div className="shrink-0">
+                <LogoutButton />
+              </div>
+            </div>
           </div>
         </div>
       </div>

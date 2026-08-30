@@ -8,3 +8,15 @@ export interface Service {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreateServiceInput {
+  name: string;
+  price: string;
+  durationMinutes: number;
+}
+
+export interface UpdateServiceInput {
+  name?: string;
+  price?: string;
+  durationMinutes?: number;
+}

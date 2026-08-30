@@ -15,7 +15,7 @@ export function LogoutButton() {
       onClick={() => signOut({ callbackUrl: "/login" })}
     >
       <LogOut className="h-4 w-4" />
-      Αποσύνδεση
+      {/* Αποσύνδεση */}
     </Button>
   );
 }
