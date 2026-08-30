@@ -7,24 +7,31 @@ import Header from "@/components/header/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { useAppointmentStats } from "@/features/appointments/use-appointments-stats";
+import { useAppointments } from "@/features/appointments/queries";
 
 export default function AppointmentsPage() {
   const [view, setView] = useState<"all" | "active">("all");
   const [search, setSearch] = useState("");
 
+  const { data: appointments, isLoading, isError } = useAppointments();
+
+  const { activeAppointments, todayAppointments } =
+    useAppointmentStats(appointments);
+
   return (
     <>
       <Header
         heroBgUrl="/images/after-glow-header.png"
-        heroTitle="Ραντεβού"
+        heroTitle="Ιστορικό Ραντεβού"
         avatarImgUrl="/images/after-glow-logo.jpg"
         avatarAlt="After Glow Logo"
         calendarColor="text-pink-600"
         infoTextboxBgColor="bg-pink-50"
-        textInfoOne="Ραντεβού"
-        textInfoTwo="Διαχείριση"
-        isLoading={false}
-        isError={false}
+        textInfoOne={`${activeAppointments?.length} ${activeAppointments?.length > 1 ? "ενεργά" : "ενεργό"} ραντεβού`}
+        textInfoTwo={`Σήμερα: ${todayAppointments?.length} ραντεβού`}
+        isLoading={isLoading}
+        isError={isError}
       />
 
       <div className="px-3 pb-8 sm:px-5 lg:px-8">
