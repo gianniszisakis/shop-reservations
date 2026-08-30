@@ -61,18 +61,26 @@ export default function AppointmentsPage() {
         return true;
       }
 
-      return (
+      const customerMatch =
         appointment.customer?.fullName
           ?.toLocaleLowerCase()
           .includes(searchValue) ||
         appointment.customer?.phone
           ?.toLocaleLowerCase()
           .includes(searchValue) ||
-        appointment.customer?.email?.toLocaleLowerCase().includes(searchValue)
+        appointment.customer?.email?.toLocaleLowerCase().includes(searchValue);
+
+      const serviceMatch = appointment.services?.some(({ service }) =>
+        service.name?.toLocaleLowerCase().includes(searchValue),
       );
+
+      const sourceMatch = appointment.source?.name
+        ?.toLocaleLowerCase()
+        .includes(searchValue);
+
+      return customerMatch || serviceMatch || sourceMatch;
     });
   }, [appointmentStatus, search, view]);
-
   return (
     <>
       <Header
@@ -142,7 +150,7 @@ export default function AppointmentsPage() {
                 <Input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Αναζήτηση πελάτη..."
+                  placeholder="Αναζήτηση με υπηρεσία, πελάτη ή πηγή ..."
                   className="h-11 rounded-xl pl-11"
                 />
               </div>
