@@ -15,6 +15,7 @@ import { Source } from "@/features/sources/types";
 import SourceEditSheet from "./source-edit-sheet";
 import { useDeactivateSource } from "@/features/sources/mutations";
 import DeactivateDialog from "./deactivate-dialog";
+import SourceCreateSheet from "./source-create-sheet";
 
 export default function SourcesTab() {
   const [search, setSearch] = useState("");
@@ -22,6 +23,7 @@ export default function SourcesTab() {
   const [sourceToDeactivate, setSourceToDeactivate] = useState<Source | null>(
     null,
   );
+  const [isCreateSourceOpen, setIsCreateSourceOpen] = useState(false);
 
   const { data: sources, isLoading, isError } = useSources();
   const deactivateSource = useDeactivateSource();
@@ -54,6 +56,7 @@ export default function SourcesTab() {
           <Button
             type="button"
             className="w-full rounded-xl bg-pink-600 hover:bg-pink-500 sm:w-auto"
+            onClick={() => setIsCreateSourceOpen(true)}
           >
             <Plus className="mr-2 size-4" />
             Νέα πηγή
@@ -122,6 +125,21 @@ export default function SourcesTab() {
           </div>
         )}
       </div>
+
+      <SourceEditSheet
+        source={selectedSource}
+        open={selectedSource !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedSource(null);
+          }
+        }}
+      />
+
+      <SourceCreateSheet
+        open={isCreateSourceOpen}
+        onOpenChange={setIsCreateSourceOpen}
+      />
 
       <SourceEditSheet
         source={selectedSource}
