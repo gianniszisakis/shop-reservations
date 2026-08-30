@@ -6,3 +6,13 @@ export interface Source {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreateSourceInput {
+  name: string;
+  displayOrder: number;
+}
+
+export interface UpdateSourceInput {
+  name: string;
+  displayOrder: number;
+}
