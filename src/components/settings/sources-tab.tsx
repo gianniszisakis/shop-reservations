@@ -13,12 +13,18 @@ import ManagementCard from "./management-card";
 import ManagementrCardSkeleton from "./management-card-loading";
 import { Source } from "@/features/sources/types";
 import SourceEditSheet from "./source-edit-sheet";
+import { useDeactivateSource } from "@/features/sources/mutations";
+import DeactivateDialog from "./deactivate-dialog";
 
 export default function SourcesTab() {
   const [search, setSearch] = useState("");
   const [selectedSource, setSelectedSource] = useState<Source | null>(null);
+  const [sourceToDeactivate, setSourceToDeactivate] = useState<Source | null>(
+    null,
+  );
 
   const { data: sources, isLoading, isError } = useSources();
+  const deactivateSource = useDeactivateSource();
 
   const filteredSources = useMemo(() => {
     const value = search.trim().toLocaleLowerCase();
@@ -95,9 +101,7 @@ export default function SourcesTab() {
                   },
                 ]}
                 onEdit={() => setSelectedSource(source)}
-                onDelete={() => {
-                  console.log("Deactivate source:", source.id);
-                }}
+                onDelete={() => setSourceToDeactivate(source)}
               />
             ))}
           </div>
@@ -126,6 +130,26 @@ export default function SourcesTab() {
           if (!open) {
             setSelectedSource(null);
           }
+        }}
+      />
+
+      <DeactivateDialog
+        entityName={sourceToDeactivate?.name ?? ""}
+        entityLabel="Η πηγή"
+        open={sourceToDeactivate !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSourceToDeactivate(null);
+          }
+        }}
+        onDeactivate={async () => {
+          if (!sourceToDeactivate) {
+            return;
+          }
+
+          await deactivateSource.mutateAsync(sourceToDeactivate.id);
+
+          setSourceToDeactivate(null);
         }}
       />
     </>
