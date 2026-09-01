@@ -4,6 +4,7 @@ import HeaderHeading from "./header-heading";
 import HeaderInfoBox from "./header-info-box";
 import HeaderInfoBoxSkeleton from "./header-info-box-skeleton";
 import { LogoutButton } from "./header-logout-button";
+import { HistoricDataButton } from "./historic-data-button";
 import { SettingsButton } from "./settings-button";
 
 interface HeaderProps {
@@ -84,6 +85,10 @@ export default function Header({
 
               <div className="shrink-0">
                 <SettingsButton />
+              </div>
+
+              <div className="shrink-0">
+                <HistoricDataButton />
               </div>
 
               <div className="shrink-0">
