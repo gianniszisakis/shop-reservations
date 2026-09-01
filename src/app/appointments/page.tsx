@@ -52,30 +52,38 @@ export default function AppointmentsPage() {
           )
         : appointmentsWithStatus;
 
-    return source.filter((appointment) => {
-      if (!searchValue) {
-        return true;
-      }
+    return source
+      .filter((appointment) => {
+        if (!searchValue) {
+          return true;
+        }
 
-      const customerMatch =
-        appointment.customer?.fullName
-          ?.toLocaleLowerCase()
-          .includes(searchValue) ||
-        appointment.customer?.phone
-          ?.toLocaleLowerCase()
-          .includes(searchValue) ||
-        appointment.customer?.email?.toLocaleLowerCase().includes(searchValue);
+        const customerMatch =
+          appointment.customer?.fullName
+            ?.toLocaleLowerCase()
+            .includes(searchValue) ||
+          appointment.customer?.phone
+            ?.toLocaleLowerCase()
+            .includes(searchValue) ||
+          appointment.customer?.email
+            ?.toLocaleLowerCase()
+            .includes(searchValue);
 
-      const serviceMatch = appointment.services?.some(({ service }) =>
-        service.name?.toLocaleLowerCase().includes(searchValue),
+        const serviceMatch = appointment.services?.some(({ service }) =>
+          service.name?.toLocaleLowerCase().includes(searchValue),
+        );
+
+        const sourceMatch = appointment.source?.name
+          ?.toLocaleLowerCase()
+          .includes(searchValue);
+
+        return customerMatch || serviceMatch || sourceMatch;
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.startDateTime).getTime() -
+          new Date(a.startDateTime).getTime(),
       );
-
-      const sourceMatch = appointment.source?.name
-        ?.toLocaleLowerCase()
-        .includes(searchValue);
-
-      return customerMatch || serviceMatch || sourceMatch;
-    });
   }, [appointmentsWithStatus, search, view]);
 
   return (
