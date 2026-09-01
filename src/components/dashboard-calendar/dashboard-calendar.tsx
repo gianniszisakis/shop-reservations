@@ -17,6 +17,10 @@ import BackHeader from "../sheet/sheet-header";
 import BookingDetails from "../booking/booking-details";
 import ErrorState from "../shared/error-state";
 import CalendarAppointmentCardSkeleton from "./calendar-appointment-card-skeleton";
+import {
+  getAppointmentStatus,
+  getAppointmentsWithStatus,
+} from "@/features/appointments/utils";
 
 const DAY_NAMES = ["Κυρ", "Δευ", "Τρι", "Τετ", "Πεμ", "Παρ", "Σαβ"];
 
@@ -51,6 +55,7 @@ export default function DashboardCalendar() {
     useState<Appointment | null>(null);
 
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [now] = useState(() => new Date());
   const { data: appointments, isLoading, isError } = useAppointments();
 
   const week = getWeek(currentWeek);
@@ -74,12 +79,10 @@ export default function DashboardCalendar() {
     day: "2-digit",
   }).format(selectedDate);
 
-  const selectedDayAppointments = useMemo(() => {
-    if (!appointments) {
-      return [];
-    }
+  const appointmentStatus = getAppointmentsWithStatus(appointments, now);
 
-    return appointments
+  const selectedDayAppointments = useMemo(() => {
+    return appointmentStatus
       .filter((appointment) => {
         const appointmentDate = new Intl.DateTimeFormat("en-CA", {
           timeZone: "Europe/Athens",
@@ -95,7 +98,7 @@ export default function DashboardCalendar() {
           new Date(a.startDateTime).getTime() -
           new Date(b.startDateTime).getTime(),
       );
-  }, [appointments, selectedDateKey]);
+  }, [appointmentStatus, selectedDateKey]);
 
   return (
     <div className="pb-4">

@@ -6,14 +6,14 @@ import { appointmentStatusMap } from "@/features/appointments/utils";
 
 interface LatestBookingCardProps {
   appointment: Appointment;
-  status?: Appointment["status"];
+  showStatus?: boolean;
 }
 
 export function LatestBookingCard({
   appointment,
-  status = appointment.status,
+  showStatus,
 }: LatestBookingCardProps) {
-  const statusInfo = appointmentStatusMap[status];
+  const status = appointmentStatusMap[appointment?.status];
   return (
     <Card className="w-full overflow-hidden transition-shadow duration-200 hover:shadow-lg p-0 mb-4">
       <div className="flex">
@@ -93,12 +93,11 @@ export function LatestBookingCard({
             </p>
           </div>
 
-          <Badge
-            variant="outline"
-            className={`shrink-0 ${statusInfo.className}`}
-          >
-            {statusInfo.label}
-          </Badge>
+          {showStatus ? (
+            <Badge variant="outline" className={`shrink-0 ${status.className}`}>
+              {status.label}
+            </Badge>
+          ) : null}
         </div>
 
         {/* Right-center arrow */}
