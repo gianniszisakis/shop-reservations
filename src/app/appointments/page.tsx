@@ -12,16 +12,19 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useAppointmentStats } from "@/features/appointments/use-appointments-stats";
 import { useAppointments } from "@/features/appointments/queries";
 import type { Appointment } from "@/features/appointments/types";
+import { getAppointmentsWithStatus } from "@/features/appointments/utils";
 
 import { LatestBookingCard } from "@/components/latest-bookings/latest-booking-card";
 import { LatestBookingCardSkeleton } from "@/components/latest-bookings/latest-booking-card-skeleton";
 import ErrorState from "@/components/shared/error-state";
 import BackHeader from "@/components/sheet/sheet-header";
 import BookingDetails from "@/components/booking/booking-details";
-import { getAppointmentStatus } from "@/features/appointments/utils";
 
 export default function AppointmentsPage() {
+  const [now] = useState(() => new Date());
+
   const [view, setView] = useState<"all" | "active">("all");
+
   const [search, setSearch] = useState("");
 
   const [selectedAppointment, setSelectedAppointment] =
@@ -29,34 +32,27 @@ export default function AppointmentsPage() {
 
   const [isSheetOpen, setSheetOpen] = useState(false);
 
-  const {
-    data: appointments,
-    isLoading,
-    isError,
-    dataUpdatedAt,
-  } = useAppointments();
+  const { data: appointments, isLoading, isError } = useAppointments();
 
   const { activeAppointments, todayAppointments } =
     useAppointmentStats(appointments);
 
-  const appointmentStatus = useMemo(() => {
-    return (
-      appointments?.map((appointment) => ({
-        appointment,
-        status: getAppointmentStatus(appointment, new Date(dataUpdatedAt)),
-      })) ?? []
-    );
-  }, [appointments, dataUpdatedAt]);
+  const appointmentsWithStatus = useMemo(
+    () => getAppointmentsWithStatus(appointments, now),
+    [appointments, now],
+  );
 
   const filteredAppointments = useMemo(() => {
     const searchValue = search.trim().toLocaleLowerCase();
 
     const source =
       view === "active"
-        ? appointmentStatus.filter(({ status }) => status === "CONFIRMED")
-        : appointmentStatus;
+        ? appointmentsWithStatus.filter(
+            (appointment) => appointment.status === "CONFIRMED",
+          )
+        : appointmentsWithStatus;
 
-    return source.filter(({ appointment }) => {
+    return source.filter((appointment) => {
       if (!searchValue) {
         return true;
       }
@@ -80,7 +76,8 @@ export default function AppointmentsPage() {
 
       return customerMatch || serviceMatch || sourceMatch;
     });
-  }, [appointmentStatus, search, view]);
+  }, [appointmentsWithStatus, search, view]);
+
   return (
     <>
       <Header
@@ -91,7 +88,7 @@ export default function AppointmentsPage() {
         calendarColor="text-pink-600"
         infoTextboxBgColor="bg-pink-50"
         textInfoOne={`${activeAppointments.length} ${
-          activeAppointments.length > 1 ? "ενεργά" : "ενεργό"
+          activeAppointments.length === 1 ? "ενεργό" : "ενεργά"
         } ραντεβού`}
         textInfoTwo={`Σήμερα: ${todayAppointments.length} ραντεβού`}
         isLoading={isLoading}
@@ -150,7 +147,7 @@ export default function AppointmentsPage() {
                 <Input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Αναζήτηση με υπηρεσία, πελάτη ή πηγή ..."
+                  placeholder="Αναζήτηση με υπηρεσία, πελάτη ή πηγή..."
                   className="h-11 rounded-xl pl-11"
                 />
               </div>
@@ -168,7 +165,7 @@ export default function AppointmentsPage() {
             ) : isError ? (
               <ErrorState message="Αδυναμία φόρτωσης ραντεβού" />
             ) : filteredAppointments.length > 0 ? (
-              filteredAppointments.map(({ appointment, status }) => (
+              filteredAppointments.map((appointment) => (
                 <button
                   key={appointment.id}
                   type="button"
@@ -178,10 +175,7 @@ export default function AppointmentsPage() {
                     setSheetOpen(true);
                   }}
                 >
-                  <LatestBookingCard
-                    appointment={appointment}
-                    status={status}
-                  />
+                  <LatestBookingCard appointment={appointment} showStatus />
                 </button>
               ))
             ) : (

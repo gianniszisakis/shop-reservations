@@ -1,5 +1,17 @@
 import type { Appointment } from "./types";
 
+export function getAppointmentsWithStatus(
+  appointments: Appointment[] | undefined,
+  now: Date,
+): Appointment[] {
+  return (
+    appointments?.map((appointment) => ({
+      ...appointment,
+      status: getAppointmentStatus(appointment, now),
+    })) ?? []
+  );
+}
+
 export function getAppointmentStatus(
   appointment: Appointment,
   now: Date,
@@ -8,9 +20,7 @@ export function getAppointmentStatus(
     return appointment.status;
   }
 
-  const endDateTime = new Date(appointment.endDateTime);
-
-  if (endDateTime <= now) {
+  if (new Date(appointment.endDateTime) <= now) {
     return "COMPLETED";
   }
 
