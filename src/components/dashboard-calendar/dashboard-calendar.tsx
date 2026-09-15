@@ -17,10 +17,7 @@ import BackHeader from "../sheet/sheet-header";
 import BookingDetails from "../booking/booking-details";
 import ErrorState from "../shared/error-state";
 import CalendarAppointmentCardSkeleton from "./calendar-appointment-card-skeleton";
-import {
-  getAppointmentStatus,
-  getAppointmentsWithStatus,
-} from "@/features/appointments/utils";
+import { getAppointmentsWithStatus } from "@/features/appointments/utils";
 
 const DAY_NAMES = ["Κυρ", "Δευ", "Τρι", "Τετ", "Πεμ", "Παρ", "Σαβ"];
 
