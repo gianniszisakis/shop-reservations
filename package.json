@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "db:seed": "tsx prisma/seed.ts",
+    "seed:production-user": "tsx prisma/seed-production-user.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
