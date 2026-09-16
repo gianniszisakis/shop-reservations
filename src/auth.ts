@@ -1,43 +1,84 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
+import { prisma } from "@/lib/prisma";
+import { verifyPassword } from "@/lib/password";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       name: "Credentials",
+
       credentials: {
-        username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" },
+        username: {
+          label: "Username",
+          type: "text",
+        },
+        password: {
+          label: "Password",
+          type: "password",
+        },
       },
-      authorize(credentials) {
+
+      async authorize(credentials) {
         const username = credentials?.username;
         const password = credentials?.password;
 
         if (
-          !process.env.ADMIN_USERNAME ||
-          !process.env.ADMIN_PASSWORD ||
           typeof username !== "string" ||
-          username.length === 0 ||
           typeof password !== "string" ||
-          password.length === 0
+          !username ||
+          !password
         ) {
           return null;
         }
 
-        if (
-          username === process.env.ADMIN_USERNAME &&
-          password === process.env.ADMIN_PASSWORD
-        ) {
-          return {
-            id: "1",
-            name: "Admin",
-            email: "admin@eshop.com",
-          };
+        /*
+         * Local development:
+         * use the credentials from .env.local
+         */
+        if (process.env.NODE_ENV === "development") {
+          if (
+            username === process.env.ADMIN_USERNAME &&
+            password === process.env.ADMIN_PASSWORD
+          ) {
+            return {
+              id: "local-admin",
+              name: "Admin",
+            };
+          }
+
+          return null;
         }
-        return null;
+
+        /*
+         * Production:
+         * authenticate against the User table
+         */
+        const user = await prisma.user.findUnique({
+          where: {
+            username,
+          },
+        });
+
+        if (!user || !user.isActive) {
+          return null;
+        }
+
+        const validPassword = await verifyPassword(password, user.passwordHash);
+
+        if (!validPassword) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          name: user.username,
+        };
       },
     }),
   ],
+
   session: {
     strategy: "jwt",
   },
